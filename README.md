@@ -1,36 +1,87 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🏊 AquaBook - Premium Pool Lane Booking System
 
-## Getting Started
+AquaBook is a state-of-the-art, high-performance aquatic facility management system. Built with modern web technologies, it provides a seamless, high-end experience for both swimmers and facility managers to reserve professional lanes in real-time.
 
-First, run the development server:
+---
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## ✨ Key Features
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+- **8 Professional Lanes**: Competition-standard lane management with real-time availability.
+- **Instant Booking**: Smart, live-checked time slots (6 AM – 10 PM) with instant confirmation.
+- **Dynamic Dashboard**: Personalized view of upcoming, completed, and cancelled sessions.
+- **Intelligent Status Tracking**: Automatic updates as sessions occur, transitioning bookings from 'upcoming' to 'completed'.
+- **Premium UI/UX**: A cutting-edge dark aesthetic featuring:
+  - **Glassmorphism** depth and transparency.
+  - **Interactive Hover Effects** and micro-animations.
+  - **Animated Backgrounds** with CSS-powered gradients and floating elements.
+  - **Responsive Design** optimized for desktop, tablet, and mobile.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+---
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## 🛠️ Tech Stack
 
-## Learn More
+- **Framework**: [Next.js 15+](https://nextjs.org/) (App Router Architecture)
+- **Library**: [React 19](https://react.dev/) (with React Compiler integration)
+- **Styling**: [Tailwind CSS 4.0](https://tailwindcss.com/) (using `@tailwindcss/postcss`)
+- **Database**: JSON-based persistent storage (Ready for Supabase/PostgreSQL migration)
+- **Auth/Backend**: [Supabase](https://supabase.com/) integration ready.
+- **Language**: [TypeScript](https://www.typescriptlang.org/) for maximum type-safety.
 
-To learn more about Next.js, take a look at the following resources:
+---
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 🚀 Getting Started
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### Prerequisites
 
-## Deploy on Vercel
+- [Node.js 20+](https://nodejs.org/)
+- npm, yarn, or pnpm
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Installation
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+1. **Clone the repository:**
+   ```bash
+   git clone https://github.com/dexdivine9-source/Aqua-protocol.git
+   cd Aqua-protocol
+   ```
+
+2. **Install dependencies:**
+   ```bash
+   npm install
+   ```
+
+3. **Run the development server:**
+   ```bash
+   npm run dev
+   ```
+
+4. **Open your browser:**
+   Navigate to [http://localhost:3000](http://localhost:3000) to see the application in action.
+
+---
+
+## 🏗️ Project Structure
+
+- `src/app/`: Core routing and page structure.
+- `src/components/`: Reusable high-end UI components.
+- `src/hooks/`: Custom React hooks for business logic (e.g., `useBookings`).
+- `src/lib/`: Database and utility functions.
+- `src/api/`: Server-side API endpoints for booking management.
+
+---
+
+## 🛣️ Roadmap
+
+- [ ] **Stripe Integration**: For real-world payment processing.
+- [ ] **Auth System**: User profiles and authentication via Supabase Auth.
+- [ ] **Admin Panel**: Comprehensive management suite for pool staff.
+- [ ] **Email Notifications**: Automated reminders and confirmation receipts.
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the LICENSE file for details.
+
+---
+
+*Built with ❤️ for the swimming community.*
