@@ -165,21 +165,34 @@ function BookingCard({ booking, onCancel }: { booking: Booking; onCancel: (id: s
             borderColor: booking.status === "upcoming" ? "rgba(6,182,212,0.2)" : undefined,
         }}>
             <div style={{ display: "flex", alignItems: "center", gap: 18, flex: 1, flexWrap: "wrap" }}>
-                {/* Lane badge */}
+                {/* Lane/Event badge */}
                 <div style={{
-                    width: 54, height: 54, borderRadius: 14, flexShrink: 0,
+                    minWidth: 54, height: 54, borderRadius: 14, flexShrink: 0,
                     background: "linear-gradient(135deg,rgba(6,182,212,0.12),rgba(99,102,241,0.12))",
                     border: "1px solid rgba(6,182,212,0.2)",
                     display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
+                    padding: "0 8px",
                 }}>
-                    <span style={{ fontSize: 10, color: "rgba(255,255,255,0.4)", letterSpacing: "0.04em" }}>LANE</span>
-                    <span style={{ fontSize: 22, fontWeight: 900, color: "#22d3ee", lineHeight: 1 }}>{booking.lane}</span>
+                    <span style={{ fontSize: 9, color: "rgba(255,255,255,0.4)", letterSpacing: "0.04em", fontWeight: 700 }}>
+                        {booking.lane === 0 ? "POOL" : "LANE"}
+                    </span>
+                    <span style={{ fontSize: booking.lane === 0 ? 12 : 22, fontWeight: 900, color: "#22d3ee", lineHeight: 1 }}>
+                        {booking.lane === 0 ? "ENTRY" : booking.lane}
+                    </span>
                 </div>
 
                 <div style={{ flex: 1, minWidth: 200 }}>
                     <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
                         <span style={{ color: "white", fontWeight: 700, fontSize: 15 }}>{booking.name}</span>
                         <span className={`badge-${booking.status}`}>{booking.status.charAt(0).toUpperCase() + booking.status.slice(1)}</span>
+                        {booking.type && booking.type !== "lane" && (
+                            <span style={{ 
+                                fontSize: 10, fontWeight: 800, padding: "2px 8px", borderRadius: 4,
+                                background: "rgba(129,140,248,0.2)", color: "#818cf8", border: "1px solid rgba(129,140,248,0.3)"
+                            }}>
+                                {booking.type.toUpperCase().replace("_", " ")}
+                            </span>
+                        )}
                         {booking.paymentIntentId && (
                             <span style={{ fontSize: 11, color: "rgba(255,255,255,0.3)", fontFamily: "monospace" }}>
                                 {booking.paymentIntentId}

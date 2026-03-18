@@ -12,20 +12,24 @@ export async function POST(req: Request) {
 
         const currentBookings = await getBookings();
 
-        // Prevent double booking
-        const isConflict = currentBookings.some(
-            (b) =>
-                b.status === "upcoming" &&
-                b.date === body.date &&
-                b.timeSlot === body.timeSlot &&
-                b.lane === body.lane
-        );
+        // Prevent double booking logic (handling All-Lanes vs Single-Lane)
+        const isConflict = currentBookings.some((b) => {
+            if (b.status !== "upcoming" || b.date !== body.date || b.timeSlot !== body.timeSlot) {
+                return false;
+            }
+            // If new booking is for ALL lanes, it conflicts with any existing booking
+            if (body.lane === 0) return true;
+            // If existing booking is for ALL lanes, it conflicts with any new lane request
+            if (b.lane === 0) return true;
+            // Otherwise, conflict only if it's the same lane
+            return b.lane === body.lane;
+        });
 
         if (isConflict) {
-            return NextResponse.json(
-                { error: "This slot is already booked. Please choose another lane or time." },
-                { status: 409 }
-            );
+            const msg = body.lane === 0 
+                ? "This time slot has existing lane bookings. A full-pool party cannot be scheduled."
+                : "This lane or the entire pool is already booked for this time.";
+            return NextResponse.json({ error: msg }, { status: 409 });
         }
 
         // Mock generating a Payment Intent

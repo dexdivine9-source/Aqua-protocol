@@ -15,7 +15,15 @@ export default function BookingPage() {
     const router = useRouter();
     const { addBooking, bookings } = useBookings();
 
-    const [form, setForm] = useState({ name: "", email: "", date: "", timeSlot: "", lane: 0, swimmers: 1 });
+    const [form, setForm] = useState({ 
+        name: "", 
+        email: "", 
+        date: "", 
+        timeSlot: "", 
+        lane: 0, 
+        swimmers: 1, 
+        type: "lane" as "lane" | "birthday" | "hangout" | "night_party" 
+    });
     const [submitted, setSubmitted] = useState(false);
     const [bookingId, setBookingId] = useState("");
     const [errors, setErrors] = useState<Record<string, string>>({});
@@ -39,11 +47,15 @@ export default function BookingPage() {
         return Object.keys(e).length === 0;
     };
 
-    // Check if a lane+timeslot combo is already booked on the selected date
+    // Check if a slot is taken, accounting for full-pool (lane 0) vs individual lanes
     const isSlotTaken = (slot: string, lane: number) =>
-        bookings.some(
-            b => b.status === "upcoming" && b.date === form.date && b.timeSlot === slot && b.lane === lane
-        );
+        bookings.some(b => {
+            if (b.status !== "upcoming" || b.date !== form.date || b.timeSlot !== slot) return false;
+            // If the EXISTING booking is all-lanes, or the NEW request is all-lanes, it's taken
+            if (b.lane === 0 || lane === 0) return true;
+            // Otherwise, only if same lane
+            return b.lane === lane;
+        });
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -64,8 +76,9 @@ export default function BookingPage() {
                 email: form.email,
                 date: form.date,
                 timeSlot: form.timeSlot,
-                lane: form.lane,
+                lane: form.type === "lane" ? form.lane : 0,
                 swimmers: form.swimmers,
+                type: form.type,
             });
             setBookingId(b.id);
             setSubmitted(true);
@@ -96,7 +109,8 @@ export default function BookingPage() {
                             ["📧 Email", form.email],
                             ["📅 Date", new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })],
                             ["⏰ Time", form.timeSlot],
-                            ["🏊 Lane", `Lane ${form.lane}`],
+                            ["🏊 Mode", form.type === "lane" ? `Lane ${form.lane}` : "Full Pool (All Lanes)"],
+                            ["🎉 Type", form.type.charAt(0).toUpperCase() + form.type.slice(1)],
                             ["👥 Swimmers", String(form.swimmers)],
                         ].map(([label, val]) => (
                             <div key={label} style={{ display: "flex", justifyContent: "space-between", alignItems: "center", padding: "10px 0", borderBottom: "1px solid rgba(255,255,255,0.06)" }}>
@@ -111,7 +125,7 @@ export default function BookingPage() {
                             View Dashboard
                         </button>
                         <button className="btn-secondary" style={{ padding: "12px 28px", fontSize: 14 }}
-                            onClick={() => { setSubmitted(false); setForm({ name: "", email: "", date: "", timeSlot: "", lane: 0, swimmers: 1 }); }}>
+                            onClick={() => { setSubmitted(false); setForm({ name: "", email: "", date: "", timeSlot: "", lane: 0, swimmers: 1, type: "lane" }); }}>
                             Book Another
                         </button>
                     </div>
@@ -132,6 +146,39 @@ export default function BookingPage() {
 
             <div style={{ maxWidth: 780, margin: "0 auto", padding: "0 24px 80px" }}>
                 <form onSubmit={handleSubmit}>
+
+                    {/* ── STEP 0: Booking Type ── */}
+                    <div className="glass-card" style={{ padding: "32px", marginBottom: 20 }}>
+                        <h2 style={{ fontWeight: 700, color: "white", fontSize: "1.05rem", marginBottom: 24, display: "flex", alignItems: "center", gap: 10 }}>
+                            <span style={{ background: "linear-gradient(135deg,#22d3ee,#818cf8)", borderRadius: 8, width: 28, height: 28, display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 13, fontWeight: 700, color: "white" }}>★</span>
+                            What are you booking for?
+                        </h2>
+                        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(140px, 1fr))", gap: 12 }}>
+                            {[
+                                { id: "lane", label: "Individual Lane", icon: "🏊" },
+                                { id: "birthday", label: "Birthday Party", icon: "🎂" },
+                                { id: "hangout", label: "Social Hangout", icon: "🤝" },
+                                { id: "night_party", label: "Night Party", icon: "🌙" },
+                            ].map(t => (
+                                <button key={t.id} type="button" 
+                                    onClick={() => {
+                                        setField("type", t.id);
+                                        if (t.id !== "lane") setField("lane", 0);
+                                        else setField("lane", 0); // reset lane when switching to individual
+                                    }}
+                                    className={`glass-card ${form.type === t.id ? "selected" : ""}`}
+                                    style={{ 
+                                        padding: "16px", cursor: "pointer", transition: "all 0.2s", textAlign: "center",
+                                        background: form.type === t.id ? "rgba(34,211,238,0.15)" : "rgba(255,255,255,0.03)",
+                                        borderColor: form.type === t.id ? "#22d3ee" : "rgba(255,255,255,0.1)",
+                                    }}
+                                >
+                                    <div style={{ fontSize: 24, marginBottom: 8 }}>{t.icon}</div>
+                                    <div style={{ fontSize: 12, fontWeight: 700, color: form.type === t.id ? "#22d3ee" : "white" }}>{t.label}</div>
+                                </button>
+                            ))}
+                        </div>
+                    </div>
 
                     {/* ── STEP 1: Personal Info ── */}
                     <div className="glass-card" style={{ padding: "32px", marginBottom: 20 }}>
@@ -171,9 +218,11 @@ export default function BookingPage() {
                         {/* Lane quick-pick banner (helps user understand context for slot colouring) */}
                         {form.date && (
                             <div style={{ background: "rgba(6,182,212,0.07)", border: "1px solid rgba(6,182,212,0.18)", borderRadius: 12, padding: "10px 16px", marginBottom: 20, fontSize: 13, color: "rgba(255,255,255,0.55)" }}>
-                                {form.lane
-                                    ? <>Showing availability for <span style={{ color: "#22d3ee", fontWeight: 600 }}>Lane {form.lane}</span> on <span style={{ color: "#22d3ee", fontWeight: 600 }}>{new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>. Greyed slots are already booked.</>
-                                    : <>Select a lane in Step 3 first to see live slot availability.</>
+                                {form.type !== "lane" 
+                                    ? <>Check availability for a <span style={{ color: "#22d3ee", fontWeight: 600 }}>Full Pool Event</span> on <span style={{ color: "#22d3ee", fontWeight: 600 }}>{new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>. Greyed slots have existing bookings.</>
+                                    : form.lane
+                                        ? <>Showing availability for <span style={{ color: "#22d3ee", fontWeight: 600 }}>Lane {form.lane}</span> on <span style={{ color: "#22d3ee", fontWeight: 600 }}>{new Date(form.date + "T00:00:00").toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" })}</span>. Greyed slots are already booked.</>
+                                        : <>Select a lane in Step 3 first to see live slot availability.</>
                                 }
                             </div>
                         )}
@@ -185,7 +234,7 @@ export default function BookingPage() {
                                 </p>
                                 <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
                                     {TIME_SLOTS[period].map(slot => {
-                                        const taken = form.date && form.lane > 0 && isSlotTaken(slot, form.lane);
+                                        const taken = form.date && (form.type === "lane" ? (form.lane > 0 && isSlotTaken(slot, form.lane)) : isSlotTaken(slot, 0));
                                         return (
                                             <button key={slot} type="button"
                                                 disabled={!!taken}
@@ -212,24 +261,34 @@ export default function BookingPage() {
                         </h2>
 
                         <div style={{ marginBottom: 28 }}>
-                            <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 13, marginBottom: 14, fontWeight: 500 }}>
-                                Select Lane (1–8)
-                                {form.date && form.timeSlot && <span style={{ color: "rgba(255,255,255,0.35)", fontWeight: 400, marginLeft: 8 }}>— booked lanes for this slot are greyed out</span>}
-                            </label>
-                            <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
-                                {[1, 2, 3, 4, 5, 6, 7, 8].map(n => {
-                                    const taken = form.date && form.timeSlot && isSlotTaken(form.timeSlot, n);
-                                    return (
-                                        <button key={n} type="button"
-                                            disabled={!!taken}
-                                            onClick={() => !taken && setField("lane", n)}
-                                            className={`lane-btn ${form.lane === n ? "selected" : ""}`}
-                                            style={{ opacity: taken ? 0.3 : 1, cursor: taken ? "not-allowed" : "pointer" }}
-                                        >{n}</button>
-                                    );
-                                })}
-                            </div>
-                            {errors.lane && <p style={{ color: "#f87171", fontSize: 12, marginTop: 8 }}>{errors.lane}</p>}
+                            {form.type === "lane" ? (
+                                <>
+                                    <label style={{ display: "block", color: "rgba(255,255,255,0.6)", fontSize: 13, marginBottom: 14, fontWeight: 500 }}>
+                                        Select Lane (1–8)
+                                        {form.date && form.timeSlot && <span style={{ color: "rgba(255,255,255,0.35)", fontWeight: 400, marginLeft: 8 }}>— booked lanes for this slot are greyed out</span>}
+                                    </label>
+                                    <div style={{ display: "flex", gap: 10, flexWrap: "wrap" }}>
+                                        {[1, 2, 3, 4, 5, 6, 7, 8].map(n => {
+                                            const taken = form.date && form.timeSlot && isSlotTaken(form.timeSlot, n);
+                                            return (
+                                                <button key={n} type="button"
+                                                    disabled={!!taken}
+                                                    onClick={() => !taken && setField("lane", n)}
+                                                    className={`lane-btn ${form.lane === n ? "selected" : ""}`}
+                                                    style={{ opacity: taken ? 0.3 : 1, cursor: taken ? "not-allowed" : "pointer" }}
+                                                >{n}</button>
+                                            );
+                                        })}
+                                    </div>
+                                    {errors.lane && <p style={{ color: "#f87171", fontSize: 12, marginTop: 8 }}>{errors.lane}</p>}
+                                </>
+                            ) : (
+                                <div style={{ background: "rgba(34,211,238,0.1)", border: "1px dashed rgba(34,211,238,0.3)", borderRadius: 16, padding: "20px", textAlign: "center" }}>
+                                    <div style={{ fontSize: 24, marginBottom: 6 }}>🏛️</div>
+                                    <p style={{ color: "white", fontWeight: 700, fontSize: 14 }}>Private Event Reservation</p>
+                                    <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 12 }}>Parties reserve all 8 lanes exclusively for your group.</p>
+                                </div>
+                            )}
                         </div>
 
                         <div>
@@ -238,9 +297,9 @@ export default function BookingPage() {
                                 <button type="button" onClick={() => setField("swimmers", Math.max(1, form.swimmers - 1))}
                                     style={{ width: 40, height: 40, borderRadius: 10, cursor: "pointer", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>−</button>
                                 <span style={{ fontSize: "1.8rem", fontWeight: 800, color: "white", minWidth: 40, textAlign: "center" }}>{form.swimmers}</span>
-                                <button type="button" onClick={() => setField("swimmers", Math.min(8, form.swimmers + 1))}
+                                <button type="button" onClick={() => setField("swimmers", Math.min(form.type === "lane" ? 8 : 50, form.swimmers + 1))}
                                     style={{ width: 40, height: 40, borderRadius: 10, cursor: "pointer", background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.12)", color: "white", fontSize: 20, display: "flex", alignItems: "center", justifyContent: "center" }}>+</button>
-                                <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>Max 8 per lane</span>
+                                <span style={{ color: "rgba(255,255,255,0.35)", fontSize: 13 }}>{form.type === "lane" ? "Max 8 per lane" : "Max 50 for events"}</span>
                             </div>
                         </div>
                     </div>

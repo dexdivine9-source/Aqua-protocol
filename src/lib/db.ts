@@ -7,8 +7,9 @@ export interface Booking {
     email: string;
     date: string;
     timeSlot: string;
-    lane: number;
+    lane: number; // 0 for all lanes
     swimmers: number;
+    type: "lane" | "birthday" | "hangout" | "night_party";
     status: "upcoming" | "completed" | "cancelled";
     createdAt: string;
     paymentIntentId?: string;

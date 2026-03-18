@@ -3,7 +3,8 @@ import Link from "next/link";
 const features = [
   { icon: "🏊", title: "8 Professional Lanes", desc: "Competition-standard lanes with anti-wave dividers and precision depth markings for every skill level." },
   { icon: "⚡", title: "Instant Booking", desc: "Reserve your lane in under a minute. Real-time slot availability with instant email confirmation." },
-  { icon: "🎯", title: "Flexible Schedules", desc: "16 daily time slots from 6 AM to 10 PM, seven days a week. Swim on your terms." },
+  { icon: "🎯", title: "Flexible Schedules", desc: "16 daily time slots from 6 AM to 10 PM. Reserve for a quick swim or an all-day event." },
+  { icon: "🎉", title: "Exclusive Events", desc: "Book the entire pool for birthday parties, social hangouts, or private night sessions." },
 ];
 
 const stats = [
@@ -92,7 +93,7 @@ export default function Home() {
           </h1>
 
           <p className="animate-fade-in-up delay-2" style={{ fontSize: "1.15rem", color: "rgba(255,255,255,0.55)", maxWidth: 520, margin: "0 auto 40px", lineHeight: 1.7, opacity: 0 }}>
-            Reserve your lane at our world-class aquatic facility. Professional lanes, flexible scheduling, and an unforgettable experience.
+            Reserve your lane or book the entire pool for exclusive events. From professional training to birthday parties and night hangouts.
           </p>
 
           <div className="animate-fade-in-up delay-3" style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap", opacity: 0 }}>
@@ -144,10 +145,10 @@ export default function Home() {
           <div style={{ textAlign: "center", marginBottom: 60 }}>
             <p style={{ color: "#22d3ee", fontWeight: 700, fontSize: 12, letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 12 }}>Why AquaBook?</p>
             <h2 style={{ fontSize: "clamp(2rem,5vw,3.2rem)", fontWeight: 800, color: "white", marginBottom: 16 }}>
-              Everything for the<br /><span style={{ color: "#06b6d4" }}>perfect swim</span>
+              Everything for the<br /><span style={{ color: "#06b6d4" }}>perfect session</span>
             </h2>
             <p style={{ color: "rgba(255,255,255,0.45)", fontSize: 16, maxWidth: 480, margin: "0 auto" }}>
-              State-of-the-art facilities with a seamless booking experience.
+              State-of-the-art facilities for individual swimmers and private event hosts.
             </p>
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(280px,1fr))", gap: 24 }}>
